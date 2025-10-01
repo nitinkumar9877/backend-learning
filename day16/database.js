@@ -1,47 +1,47 @@
-// mongodb+srv://day15Learn:demo12345@day15a.5co4ep6.mongodb.net/
-// Mongodb Connection Link from MongoDB Atlets to MongoDB Campass
-const { MongoClient } = require('mongodb');
-// or as an es module:
-// import { MongoClient } from 'mongodb'
+// getting-started.js
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
-// Connection URL
-// demo12345
-const url = "mongodb+srv://day15Learn:demo12345@day15a.5co4ep6.mongodb.net/"
-const client = new MongoClient(url);
-
-// Database Name
-const dbName = 'Learning';
+main().catch(err => console.log(err));
 
 async function main() {
-    // Use connect method to connect to the server
-    await client.connect();
-    console.log('Connected successfully to server');
-    const db = client.db(dbName);
-    const collection = db.collection('user');
 
-    // to get the code we use this in our code
-    const findResult = collection.find({});
+    // end me bookstore khud daala hai for new database in campass
+    await mongoose.connect('mongodb+srv://day15Learn:demo12345@day15a.5co4ep6.mongodb.net/bookStore');
+    // use `await mongoose.connect('mongodb://user:password@127.0.0.1:27017/test');` if your database has auth enabled
+    const userSchema = new Schema({
+        Name: String,
+        Age: Number,
+        City: String,
+    })
+    
+    // model create krna database ke baad
+    // mongoose.model("user", userSchema);
+    // const User = mongoose.model("user", userSchema);
+    const User = mongoose.models.user || mongoose.model("user", userSchema);
+
+    // yaha pr jaise humhe ptaa hai ki isko object ki tarah treat krne me help krta hai mongoose to hota kiya hai ki ye hamare liye yaha ek class define krta hai jo ki blue print hoti hai and agr usko value deni hai to iska obj bana kr hi diya jata hai
+
+    // create object
+    const user1 = new User({ Name: "Saini", Age: 23, City: "Chandighar" });
+    await user1.save();
 
 
-    // // it use to get the data upper collection.find() will just point the data and we want to access so we get the use the toArray();
-    // const ans = await findResult.toArray();
-    // // toArray() supporse if we have 5gb of data then it will push all the data on real time which mean it will overload our ram and crash our data
+    // console.log("User saved:", user1);
 
-    // console.log('Found documents =>', findResult);
+    // second way
+    await User.create({ Name: "Pintu", Age: 43, City: "Bihar" });
 
-    for await (const doc of findResult) {
-        console.log(doc);
-    };
 
-    const insertResult = await collection.insertOne({Gender:"Male",Age:34});
-    console.log('Inserted documents =>', insertResult);
+    // for multiple entry
+    await User.insertMany([{ Name: "Raju", Age: 18, city: "Banglore" }, { Name: "Abhishek", Age: 2, city: "Chapra" }, { Name: "Rahul", Age: 50, city: "Phagwara" }])
+    console.log("Successfully Saved all data");
 
-    // the following code examples can be pasted here...
-
-    return 'done.';
 }
-
 main()
-    .then(console.log)
-    .catch(console.error)
-    .finally(() => client.close());
+    .then(() => {
+        console.log("Connected sucessfully");
+    })
+    .catch((err) => {
+        console.log(err);
+    })

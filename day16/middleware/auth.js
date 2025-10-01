@@ -1,1 +1,0 @@
-const Auth =<P></P>
