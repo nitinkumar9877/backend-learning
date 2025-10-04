@@ -19,14 +19,15 @@ const userSchema = new Schema({
     },
     Gender: {
         type: String,
-        enum:["male", "female", "Others"]
+        enum: ["male", "female", "Others"],
+        immutable:true,
     },
     Email: {
         type: String,
         required: true,
         unique: true,
-        trim:true,
-        lowercase:true,
+        trim: true,
+        lowercase: true,
     },
     Password: {
         type: String
@@ -35,7 +36,7 @@ const userSchema = new Schema({
         type: String,
         default: "no Photo is uploaded Now",
     }
-})
+}, { timestamps: true });
 
 const User = mongoose.models.user || mongoose.model("user", userSchema);
 

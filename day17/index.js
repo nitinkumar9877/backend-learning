@@ -7,6 +7,11 @@ app.use(express.json());
 
 app.post("/info", async (req, res) => {
     try {
+        const mandatoryField = ["FirstName", "Email", "Age"];
+        const IsAllowed = mandatoryField.every((k) => Object.keys(req.body).includes(k));
+        if (!IsAllowed) {
+            throw new Error("Field Missing");
+        }
         await User.create(req.body);
         res.send("Succesfully Post")
     }
@@ -45,16 +50,37 @@ app.delete("/info/:id", async (req, res) => {
     }
 });
 
+// app.patch("/info", async (req, res) => {
+//     try {
+//         const { _id, ...update } = req.body;
+//         await User.findByIdAndUpdate(_id, update);
+//         res.send("Successsfully patch")
+//     }
+//     catch (err) {
+//         res.send("Error -> " + err);
+//     }
+// })
+
 app.patch("/info", async (req, res) => {
     try {
         const { _id, ...update } = req.body;
-        await User.findByIdAndUpdate(_id, update);
-        res.send("Successsfully patch")
+        const updatedUser = await User.findByIdAndUpdate(
+            _id,
+            { $set: update },
+            { new: true, runValidators: true }  // important options
+        );
+
+        if (!updatedUser) {
+            return res.status(404).send("User not found");
+        }
+
+        res.json(updatedUser);  // send updated document back
     }
     catch (err) {
-        res.send("Error -> " + err);
+        res.status(400).send("Error -> " + err.message);
     }
-})
+});
+
 
 
 main()
